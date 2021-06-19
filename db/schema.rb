@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_01_215550) do
+ActiveRecord::Schema.define(version: 2020_12_01_020826) do
 
   create_table "alt_id_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
@@ -227,6 +227,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "event_slot_id"
+    t.boolean "remainder_sent", default: false
     t.index ["event_date_id"], name: "index_reservations_on_event_date_id"
     t.index ["user_id"], name: "index_reservations_on_user_id"
   end
