@@ -4,12 +4,20 @@ module Api
   # Allows an end user to reserve a spot at an agency event
   class ReservationsController < Api::BaseController
     before_action :set_reservation, only: %i[show delete]
+    skip_before_action :authenticate_user!, only: :events_count
 
     # GET /api/reservations
     def index
       @reservations = Reservation.where(user_id: current_user.id)
 
       render json: @reservations
+    end
+
+    # GET /api/reservations/events_count
+    def events_count
+      @reservations = Reservation.where(event_date_id: params[:event_date_id])
+
+      render json: { events_count: @reservations.count }
     end
 
     # GET /api/reservations/1
