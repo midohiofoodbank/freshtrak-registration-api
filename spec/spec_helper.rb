@@ -21,7 +21,7 @@ end
 Jets.boot
 
 require 'jets/spec_helpers'
-require_relative 'spec_helpers/auth_helper'
+require_relative 'support/auth_helper'
 
 module Helpers
   def payload(name)

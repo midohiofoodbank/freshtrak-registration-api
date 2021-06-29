@@ -5,8 +5,9 @@ source 'https://rubygems.org'
 gem 'active_model_serializers', '~> 0.10.10'
 gem 'faraday', '~> 1.0'
 gem 'faraday_middleware', '~> 1.0'
-
 gem 'jets', '~> 3.0.5'
+gem 'jose'
+
 gem 'jwt', '~> 2.2.1'
 gem 'sendgrid-ruby'
 gem 'twilio-ruby'

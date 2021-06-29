@@ -5,31 +5,76 @@ module Api
   #   handled as a singular resource
   #   where the user is inferred from the auth token
   class UsersController < Api::BaseController
-    # GET /api/user
+    before_action :find_user, only: %i[sign_in]
+
+    # GET /api/users/:id
     def show
-      render json: current_user
+      render json: serialized_user
     end
 
-    # PATCH/PUT /api/user
-    def update
-      if current_user.update(user_params)
-        render json: current_user
-      else
-        render json: current_user.errors, status: :unprocessable_entity
-      end
+    # POST /api/users/sign_in
+    def sign_in
+      create_user_with_nested_models
+
+      render json: {
+        message: 'User Registered Successfully', data: serialized_user
+      }, status: :ok
+    rescue StandardError => e
+      message = "User signin failed, Message: #{e.message}"
+      Jets.logger.error message
+      render json: { message: message }, status: :unprocessable_entity
     end
 
     private
 
-    # Only allow a trusted parameter "white list" through.
-    def user_params
-      params.require(:user).permit(
-        :first_name, :middle_name, :last_name, :suffix, :date_of_birth,
-        :gender, :phone, :permission_to_text, :email, :permission_to_email,
-        :address_line_1, :address_line_2, :city, :state, :zip_code,
-        :license_plate, :seniors_in_household, :adults_in_household,
-        :children_in_household
+    def create_user_with_nested_models
+      ActiveRecord::Base.transaction do
+        @current_user = User.new(user_type: :customer)
+        @current_user.identities.new(identity_params)
+        @person = @current_user.build_person
+        create_contacts if @person.valid? && @person.save!
+      end
+    end
+
+    def identity_params
+      provider_type = if @auth['identities']
+                        @auth['identities'][0]['providerName'].downcase
+                      else
+                        'cognito'
+                      end
+      {
+        'provider_uid': @auth['sub'], 'provider_type': provider_type,
+        'auth_hash': ''
+      }
+    end
+
+    def create_contacts
+      create_email
+      create_phone
+    end
+
+    def create_email
+      cont_obj = @person.contacts.create!(contact_type: 'email')
+      Email.create!(
+        contact_id: cont_obj.id, email: @auth['email'], is_primary: true
       )
+    end
+
+    def create_phone
+      cont_obj = @person.contacts.create!(contact_type: 'phone')
+      Phone.create!(
+        contact_id: cont_obj.id, phone: @auth['phone_number'], is_primary: true
+      )
+    end
+
+    def serialized_user
+      ActiveModelSerializers::SerializableResource.new(current_user).as_json
+    end
+
+    def find_user
+      return if current_user.blank?
+
+      render json: { message: 'User Already Registered' }
     end
   end
 end

@@ -2,17 +2,29 @@
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
 #
-# This file is the source Rails uses to define your schema when running `rails
-# db:schema:load`. When creating a new database, `rails db:schema:load` tends to
+# This file is the source Rails uses to define your schema when running `bin/rails
+# db:schema:load`. When creating a new database, `bin/rails db:schema:load` tends to
 # be faster and is potentially less error prone than running all of your
 # migrations from scratch. Old migrations may fail to apply correctly if those
 # migrations use external dependencies or application code.
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_01_215550) do
+ActiveRecord::Schema.define(version: 2021_05_19_084204) do
 
-  create_table "alt_id_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "addresses", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "contact_id", null: false
+    t.string "line_1", null: false
+    t.string "line_2"
+    t.string "city", null: false
+    t.string "state", null: false
+    t.string "zip_code", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["contact_id"], name: "index_addresses_on_contact_id"
+  end
+
+  create_table "alt_id_types", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "description"
     t.integer "added_by", null: false
@@ -21,7 +33,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "alt_ids", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "alt_ids", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "alt_id_type_id", null: false
     t.bigint "household_member_id", null: false
     t.string "value", null: false
@@ -33,7 +45,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.index ["household_member_id"], name: "index_alt_ids_on_household_member_id"
   end
 
-  create_table "authentications", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "authentications", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "token", null: false
     t.datetime "expires_at", null: false
@@ -43,7 +55,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.index ["user_id"], name: "index_authentications_on_user_id"
   end
 
-  create_table "carrier_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "carrier_types", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "email", null: false
     t.integer "added_by", null: false
@@ -52,7 +64,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "communication_preference_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "communication_preference_types", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "description"
     t.integer "added_by", null: false
@@ -61,7 +73,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "communication_preferences", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "communication_preferences", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "household_member_id", null: false
     t.bigint "communication_preference_type_id", null: false
     t.integer "added_by", null: false
@@ -73,7 +85,15 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.index ["household_member_id"], name: "index_communication_preferences_on_household_member_id"
   end
 
-  create_table "credentials", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "contacts", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "person_id", null: false
+    t.string "contact_type", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["person_id"], name: "index_contacts_on_person_id"
+  end
+
+  create_table "credentials", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "user_id"
     t.string "token", null: false
     t.string "secret"
@@ -86,20 +106,18 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.index ["user_id"], name: "index_credentials_on_user_id", unique: true
   end
 
-  create_table "emails", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.bigint "location_type_id", null: false
-    t.bigint "household_member_id", null: false
+  create_table "emails", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "contact_id", null: false
     t.string "email", null: false
-    t.integer "added_by", null: false
-    t.integer "last_updated_by", null: false
+    t.boolean "is_primary", default: false, null: false
+    t.boolean "permission_to_email", default: false, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["contact_id"], name: "index_emails_on_contact_id"
     t.index ["email"], name: "index_emails_on_email", unique: true
-    t.index ["household_member_id"], name: "index_emails_on_household_member_id"
-    t.index ["location_type_id"], name: "index_emails_on_location_type_id"
   end
 
-  create_table "event_registration_members", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "event_registration_members", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "event_registration_id"
     t.bigint "household_member_id"
     t.integer "added_by", null: false
@@ -110,7 +128,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.index ["household_member_id"], name: "index_event_registration_members_on_household_member_id", unique: true
   end
 
-  create_table "event_registrations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "event_registrations", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "household_id"
     t.integer "event_slot_id", null: false
     t.integer "added_by", null: false
@@ -122,7 +140,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.index ["household_id"], name: "index_event_registrations_on_household_id", unique: true
   end
 
-  create_table "event_statuses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "event_statuses", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.integer "added_by", null: false
     t.integer "last_updated_by", null: false
@@ -130,7 +148,26 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "genders", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "families", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "seniors_in_family", default: 0, null: false
+    t.integer "adults_in_family", default: 0, null: false
+    t.integer "children_in_family", default: 0, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "family_members", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "family_id", null: false
+    t.bigint "person_id", null: false
+    t.boolean "is_active", default: true, null: false
+    t.boolean "is_primary_member", default: false, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["family_id"], name: "index_family_members_on_family_id"
+    t.index ["person_id"], name: "index_family_members_on_person_id"
+  end
+
+  create_table "genders", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.integer "added_by", null: false
     t.integer "last_updated_by", null: false
@@ -138,7 +175,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "household_addresses", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "household_addresses", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "household_id"
     t.string "line_1", null: false
     t.string "line_2"
@@ -155,7 +192,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.index ["household_id"], name: "index_household_addresses_on_household_id", unique: true
   end
 
-  create_table "household_members", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "household_members", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "household_id"
     t.bigint "user_id"
     t.integer "number"
@@ -176,7 +213,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.index ["user_id"], name: "index_household_members_on_user_id"
   end
 
-  create_table "households", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "households", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "number", null: false
     t.string "name", null: false
     t.string "identification_code", null: false
@@ -189,7 +226,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.index ["identification_code"], name: "index_households_on_identification_code", unique: true
   end
 
-  create_table "identities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "identities", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "provider_uid", null: false
     t.string "provider_type", null: false
@@ -199,7 +236,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.index ["user_id"], name: "index_identities_on_user_id"
   end
 
-  create_table "location_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "location_types", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.integer "added_by", null: false
     t.integer "last_updated_by", null: false
@@ -207,7 +244,23 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "phone_numbers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "people", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "user_id"
+    t.string "first_name"
+    t.string "middle_name"
+    t.string "last_name"
+    t.string "suffix"
+    t.string "gender"
+    t.string "race"
+    t.string "ethnicity"
+    t.date "date_of_birth"
+    t.integer "last_updated_by"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_people_on_user_id"
+  end
+
+  create_table "phone_numbers", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "location_type_id", null: false
     t.bigint "carrier_type_id"
     t.bigint "household_member_id", null: false
@@ -221,17 +274,31 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.index ["location_type_id"], name: "index_phone_numbers_on_location_type_id"
   end
 
-  create_table "reservations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "phones", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "contact_id", null: false
+    t.string "phone", null: false
+    t.boolean "is_primary", default: false, null: false
+    t.boolean "permission_to_text", default: false, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["contact_id"], name: "index_phones_on_contact_id"
+    t.index ["phone"], name: "index_phones_on_phone", unique: true
+  end
+
+  create_table "reservations", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.integer "event_date_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "event_slot_id"
+    t.string "license_plate"
+    t.string "identification_code", null: false
     t.index ["event_date_id"], name: "index_reservations_on_event_date_id"
+    t.index ["identification_code"], name: "index_reservations_on_identification_code", unique: true
     t.index ["user_id"], name: "index_reservations_on_user_id"
   end
 
-  create_table "suffixes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "suffixes", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.integer "added_by", null: false
     t.integer "last_updated_by", null: false
@@ -239,7 +306,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "user_details", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "user_details", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "name", null: false
     t.string "email"
@@ -257,7 +324,7 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.index ["user_id"], name: "index_user_details_on_user_id"
   end
 
-  create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+  create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "user_type", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -283,32 +350,43 @@ ActiveRecord::Schema.define(version: 2020_09_01_215550) do
     t.string "identification_code", null: false
     t.bigint "credential_id"
     t.bigint "user_detail_id"
+    t.string "age_group", default: "Adult"
+    t.string "race"
+    t.string "ethnicity"
+    t.boolean "is_adult"
+    t.string "cognito_id"
+    t.integer "identity_provider", default: 0
     t.index ["credential_id"], name: "fk_rails_024dac10af"
     t.index ["identification_code"], name: "index_users_on_identification_code", unique: true
     t.index ["user_detail_id"], name: "fk_rails_5de4188fc5"
   end
 
+  add_foreign_key "addresses", "contacts"
   add_foreign_key "alt_ids", "alt_id_types"
   add_foreign_key "alt_ids", "household_members"
   add_foreign_key "authentications", "users"
   add_foreign_key "communication_preferences", "communication_preference_types"
   add_foreign_key "communication_preferences", "household_members"
+  add_foreign_key "contacts", "people"
   add_foreign_key "credentials", "users"
-  add_foreign_key "emails", "household_members"
-  add_foreign_key "emails", "location_types"
+  add_foreign_key "emails", "contacts"
   add_foreign_key "event_registration_members", "event_registrations"
   add_foreign_key "event_registration_members", "household_members"
   add_foreign_key "event_registrations", "event_statuses"
   add_foreign_key "event_registrations", "households"
+  add_foreign_key "family_members", "families"
+  add_foreign_key "family_members", "people"
   add_foreign_key "household_addresses", "households"
   add_foreign_key "household_members", "genders"
   add_foreign_key "household_members", "households"
   add_foreign_key "household_members", "suffixes"
   add_foreign_key "household_members", "users"
   add_foreign_key "identities", "users"
+  add_foreign_key "people", "users"
   add_foreign_key "phone_numbers", "carrier_types"
   add_foreign_key "phone_numbers", "household_members"
   add_foreign_key "phone_numbers", "location_types"
+  add_foreign_key "phones", "contacts"
   add_foreign_key "reservations", "users"
   add_foreign_key "user_details", "users"
   add_foreign_key "users", "credentials"

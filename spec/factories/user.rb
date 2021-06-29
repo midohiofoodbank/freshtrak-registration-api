@@ -2,9 +2,7 @@
 
 FactoryBot.define do
   factory :user do
-    user_type { 'guest' }
-    first_name { 'nick' }
-    last_name { 'harris' }
+    user_type { 'customer' }
     created_at { Date.today.to_s.delete('-') }
     updated_at { Date.today.to_s.delete('-') }
   end
